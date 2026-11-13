@@ -1,0 +1,225 @@
+
+
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Fortnite Chest Counter</title>
+
+<style>
+
+body {
+
+  background:#0b1020;
+
+  color:white;
+
+  font-family:Arial,sans-serif;
+
+  text-align:center;
+
+  padding:20px;
+
+}
+
+.panel {
+
+  background:#19243a;
+
+  padding:20px;
+
+  margin:15px auto;
+
+  border-radius:16px;
+
+  max-width:450px;
+
+}
+
+video {
+
+  width:100%;
+
+  background:black;
+
+  border-radius:12px;
+
+}
+
+button {
+
+  background:#a3e635;
+
+  border:0;
+
+  border-radius:10px;
+
+  padding:15px;
+
+  margin:6px;
+
+  font-weight:bold;
+
+  font-size:16px;
+
+}
+
+.secondary {
+
+  background:#34445e;
+
+  color:white;
+
+}
+
+#count {
+
+  font-size:65px;
+
+  font-weight:bold;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>🏆 FORTNITE CHEST COUNTER</h1>
+
+<div class="panel">
+
+  <h2>Camera</h2>
+
+  <video id="video" autoplay playsinline muted></video>
+
+  <p id="status">Camera is off.</p>
+
+  <button id="start">Start Camera</button>
+
+</div>
+
+<div class="panel">
+
+  <h2>Chests Opened</h2>
+
+  <div id="count">0</div>
+
+  <button id="add">＋ Add Chest</button>
+
+  <button class="secondary" id="undo">Undo</button>
+
+  <button class="secondary" id="reset">Reset</button>
+
+</div>
+
+<div class="panel">
+
+  <h3>Detection</h3>
+
+  <p>Camera preview is ready when started. Chest counting is manual in this version.</p>
+
+</div>
+
+<script>
+
+const video = document.getElementById("video");
+
+const statusText = document.getElementById("status");
+
+let stream = null;
+
+let count = 0;
+
+document.getElementById("start").onclick = async () => {
+
+  if (stream) {
+
+    stream.getTracks().forEach(track => track.stop());
+
+    stream = null;
+
+    video.srcObject = null;
+
+    statusText.textContent = "Camera is off.";
+
+    return;
+
+  }
+
+  try {
+
+    stream = await navigator.mediaDevices.getUserMedia({
+
+      video: { facingMode: { ideal: "environment" } },
+
+      audio: false
+
+    });
+
+    video.srcObject = stream;
+
+    await video.play();
+
+    statusText.textContent = "Camera is working!";
+
+    document.getElementById("start").textContent = "Stop Camera";
+
+  } catch (error) {
+
+    statusText.textContent =
+
+      "Camera blocked. Allow camera access in Safari settings.";
+
+  }
+
+};
+
+function update() {
+
+  document.getElementById("count").textContent = count;
+
+}
+
+document.getElementById("add").onclick = () => {
+
+  count++;
+
+  update();
+
+};
+
+document.getElementById("undo").onclick = () => {
+
+  count = Math.max(0, count - 1);
+
+  update();
+
+};
+
+document.getElementById("reset").onclick = () => {
+
+  count = 0;
+
+  update();
+
+};
+
+window.addEventListener("pagehide", () => {
+
+  if (stream) stream.getTracks().forEach(track => track.stop());
+
+});
+
+</script>
+
+</body>
+
+</html>
